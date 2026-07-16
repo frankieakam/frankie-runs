@@ -158,11 +158,14 @@ export default function StyleGuidePage() {
               { label: "Food Delivery", value: "food" },
               { label: "Grocery Runs", value: "grocery" },
               { label: "Parcel Delivery", value: "parcel" },
+              { label: "Document Delivery", value: "document" },
+              { label: "Market Runs", value: "market" },
+              { label: "Custom Errands", value: "errands" },
             ]}
           />
-          <Input label="Full name" placeholder="e.g. Frankie Akam" />
+          <Input label="Full name" placeholder="e.g. John Okon" />
           <Input label="With error" placeholder="e.g. 08012345678" error="Enter a valid phone number." />
-          <Textarea label="Notes" placeholder="Anything Frankie should know before pickup" />
+          <Textarea label="Notes" placeholder="Anything else I should know before pickup?" />
         </Container>
       </Section>
 
