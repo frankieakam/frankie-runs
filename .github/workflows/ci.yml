@@ -1,0 +1,96 @@
+name: CI
+
+# Runs on every push and pull request targeting master. This is a quality
+# gate, not a deployment step — Vercel's own GitHub integration already
+# handles building and deploying previews/production on push. This
+# workflow's only job is to fail loudly, before merge, if lint, types, or
+# the production build are broken. Enable "Require status checks to pass"
+# on the master branch in GitHub settings, with this workflow selected, for
+# it to actually block a bad merge rather than just reporting after the fact.
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# Cancel superseded runs on the same PR/branch so pushing a fix doesn't
+# leave stale runs queued behind it.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, typecheck, build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build
+        run: pnpm build
+        env:
+          # A real value is required for metadataBase to construct a valid URL
+          # during build. Production/Preview values are set in Vercel itself;
+          # this only needs to be well-formed for the CI build to succeed.
+          NEXT_PUBLIC_SITE_URL: https://frankieruns.vercel.app
+
+      # Placeholder for when a test suite exists — kept here so adding one
+      # later is a one-line addition to an already-working pipeline, not a
+      # new workflow to design from scratch.
+      # - name: Test
+      #   run: pnpm test
+
+  lighthouse:
+    name: Lighthouse (accessibility/SEO/best-practices, advisory only)
+    runs-on: ubuntu-latest
+    # Advisory only — reports scores without blocking merges. Treat a drop
+    # here as a prompt to investigate, not a hard failure; performance scores
+    # in particular vary with CI runner load and shouldn't gate a merge.
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://frankieruns.vercel.app
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: |
+            http://localhost:3000/
+          uploadArtifacts: true
+          temporaryPublicStorage: true

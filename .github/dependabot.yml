@@ -1,0 +1,19 @@
+version: 2
+updates:
+  # pnpm uses the npm ecosystem identifier in Dependabot
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      # Batch minor/patch bumps into one PR instead of one-per-package noise.
+      # Major bumps (which can break things, e.g. a new Next.js major) still
+      # get their own individual PR so they're reviewed on their own.
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

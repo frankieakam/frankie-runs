@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   FRANKIE RUNS — DESIGN TOKENS
+   Single source of truth for the visual brand system. Every color, font,
+   and radius used across the app should reference one of these tokens
+   rather than a raw hex/px value, so the brand system stays enforceable
+   and easy to evolve.
+   ========================================================================== */
+
+:root {
+  /* Brand colors — exact hex values from the brand system, do not alter */
+  --color-ink-teal: #0f2a2e;
+  --color-ink-soft: #173b3f;
+  --color-amber: #ff7a33;
+  --color-amber-soft: #ffa873;
+  /* Darkened variants for text/focus-ring use on paper backgrounds — the
+     base amber and sage fail WCAG AA contrast against paper at any
+     reasonable opacity (amber peaks at 2.4:1 even at full strength).
+     These preserve the same hues at a lightness that passes 4.5:1+. */
+  --color-amber-deep: #bb4100;
+  --color-sage-deep: #437554;
+  --color-sage: #8fbf9f;
+  --color-paper: #fbf7f0;
+
+  /* Semantic aliases */
+  --color-background: var(--color-paper);
+  --color-foreground: var(--color-ink-teal);
+  --color-accent: var(--color-amber);
+  --color-accent-soft: var(--color-amber-soft);
+  --color-secondary: var(--color-sage);
+
+  /* Radius scale */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-full: 9999px;
+
+  /* Shadow scale — soft, never harsh */
+  --shadow-soft-sm: 0 1px 2px rgba(15, 42, 46, 0.06), 0 1px 1px rgba(15, 42, 46, 0.04);
+  --shadow-soft-md: 0 4px 16px rgba(15, 42, 46, 0.08), 0 2px 6px rgba(15, 42, 46, 0.05);
+  --shadow-soft-lg: 0 12px 40px rgba(15, 42, 46, 0.12), 0 4px 12px rgba(15, 42, 46, 0.06);
+}
+
+@theme inline {
+  --color-ink-teal: var(--color-ink-teal);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-amber: var(--color-amber);
+  --color-amber-soft: var(--color-amber-soft);
+  --color-amber-deep: var(--color-amber-deep);
+  --color-sage-deep: var(--color-sage-deep);
+  --color-sage: var(--color-sage);
+  --color-paper: var(--color-paper);
+
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-accent: var(--color-accent);
+  --color-accent-soft: var(--color-accent-soft);
+  --color-secondary: var(--color-secondary);
+
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-full: var(--radius-full);
+
+  --shadow-soft-sm: var(--shadow-soft-sm);
+  --shadow-soft-md: var(--shadow-soft-md);
+  --shadow-soft-lg: var(--shadow-soft-lg);
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
+
+/*
+ * When the mobile nav sheet is open, the page content scales down slightly
+ * with rounded corners — the Stripe/Linear-style "background recedes"
+ * effect. Toggled via a class on <html> from MobileMenu, applied to the
+ * #page-shell wrapper in the site layout.
+ */
+#page-shell {
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.3s ease;
+  transform-origin: center top;
+}
+
+html.menu-open #page-shell {
+  transform: scale(0.96);
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+
+/*
+ * Framer Motion animations respect prefers-reduced-motion automatically via
+ * MotionConfig (see src/providers/MotionProvider.tsx). This covers the
+ * hand-written CSS transitions that Framer Motion doesn't touch — dialog/
+ * drawer open-close, the accordion, the page-shell scale effect, and hover
+ * states — collapsing them to near-instant rather than leaving them at full
+ * motion for users who've asked their OS to reduce it.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
